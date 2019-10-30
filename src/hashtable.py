@@ -4,10 +4,65 @@
 
 
 class LinkedPair:
-    def __init__(self, key, value):
+    def __init__(self, key, value, next_pair=None):
         self.key = key
         self.value = value
-        self.next = None
+        self.next = next_pair
+
+    def __str__(self):
+        return f"{self.key}, {self.value}, {self.next}"
+
+
+class LinkedList:
+    def __init__(self, set_head=None):
+        self.head = set_head
+
+    def __repr__(self):
+        return f"{self.head}"
+
+    # add to head
+    def add_to_head(self, pair):
+        if self.head is None:
+            # new_pair = LinkedPair(key, value, self.head)
+            self.head = pair
+
+    # remove
+
+    def list_remove(self, key):
+        if not self.head:
+            return None
+        elif self.head.key == key:
+            self.head = self.head.next
+        else:
+            parent = self.head
+            current = self.head.next
+            while current:
+                if current.key == key:
+                    parent.next = current.next
+                    return
+                else:
+                    parent = parent.next
+                    current = current.next
+        return None
+
+    # contains
+    def list_contains(self, key):
+        current_pair = self.head
+
+        while current_pair:
+            if current_pair.key == key:
+                return current_pair.value
+            else:
+                current_pair = current_pair.next
+
+        return None
+
+    # insert
+
+    # def list_insert(self, key, value):
+    #     current_pair = self.head
+
+    #     if current_pair is not None:
 
 
 class HashTable:
@@ -17,12 +72,12 @@ class HashTable:
     '''
 
     def __init__(self, capacity):
-        self.count = 0
+        # self.count = 0 # removing this for now
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
 
-    def __repr__(self):
-        return f"({self.storage})"
+    def __str__(self):
+        return f"{self.storage}"
 
     def _hash(self, key):
         '''
@@ -53,40 +108,28 @@ class HashTable:
 
         Hash collisions should be handled with Linked List Chaining. set 
 
-        ###############
-
-        Check if there is room in storage
-
-        If not return an error, or call resize function to double capacity
-
-        If there is, 
-
-        check if there is already key value pair stored at hash index
-
-        if there is, set new key, value paired linkedpair to current pair next value
-
-        If there is not,
-        store linkedpaired at hashed index
-
-
         '''
-        index = self._hash_mod(key)
-        # print(f"index")
-        new_pair = LinkedPair(key, value)
 
-        # Check storage available
+        index = self._hash_mod(key)
+
+        new_pair = LinkedPair(key, value)
+        new_linked_list = LinkedList(new_pair)
+
+        # Check available storage
+        # Omitting because this is happening manually in test file
+
         # if self.count >= self.capacity:
         #     print(f'We are at capacity')
         #     self.resize()
 
-        # If we have room, check if index is occupied
-        if self.storage[index] is not None:
-            # if occupied, add new pair to next value
-            self.storage[index].next = new_pair
+        # if index is empty, create new linked list with passed in pair
+        if self.storage[index] is None:
+            self.storage[index] = new_linked_list
+        # otherwise, add new pair to next value
         else:
-            self.storage[index] = new_pair
+            self.storage[index].add_to_head(new_pair)
 
-        self.count += 1
+        # self.count += 1
 
         # print(f"\n{self.storage[index]}")
 
@@ -100,10 +143,10 @@ class HashTable:
         '''
         index = self._hash_mod(key)
         if self.storage[index] is None:
-            print("There is no spoon")
-            # return
+            return None
         else:
             self.storage[index].value = None
+            # self.count -= 1
 
     def retrieve(self, key):
         '''
@@ -114,13 +157,13 @@ class HashTable:
         Fill this in.
         '''
         index = self._hash_mod(key)
-        if self.storage[index] is not None:
-            # for pair in self.storage[index]:
-            # if self.storage[index][0] == key and self.storage[index].next is None:
-            #     return self.storage[index][1]
-            return self.storage[index].value
-        else:
+
+        if self.storage[index] is None:
             return None
+        # elif self.storage[index].next is not None:
+        #     self.storage.
+        else:
+            return self.storage[index].list_contains(key)
 
     def resize(self):
         '''
@@ -129,14 +172,35 @@ class HashTable:
 
         Fill this in.
         '''
-        # old_storage = self.storage
-        # self.capacity *= 2
-        # new_storage = [None * self.capacity]
-        # for pair in old_storage:
-        #     if pair is not None:
-        #         index = self._hash_mod(pair.key)
-        #         new_storage[index] = pair
-        # self.storage = new_storage
+        print(self.storage)
+
+        # double capacity
+        self.capacity *= 2
+
+        # create new array to the doubled size
+        new_storage = [None] * self.capacity
+
+        # set old storage to current storage
+        old_storage = self.storage
+        # print(f"old storage before point"({old_storage}))
+
+        self.storage = new_storage
+
+        # this is showing currently filled HT(2)
+        print(old_storage)
+        # this is showing the 4x None's as created on line 181
+        print(self.storage)
+
+        # go through existing/old storage and re-hash all keys
+        # insert LL into new storage
+
+        # for i in range(len(old_storage)):
+        #     if old_storage[i] is not None:
+        #         current_list = old_storage.head
+        #         while current_list:
+        #             self.insert(current_list.key, current_list.value)
+        #             # index = self._hash_mod(l.key)
+        #             current_list = current_list.next
 
 
 if __name__ == "__main__":
