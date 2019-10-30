@@ -106,14 +106,14 @@ class HashTable:
         '''
         Store the value with the given key.
 
-        Hash collisions should be handled with Linked List Chaining. set 
+        Hash collisions should be handled with Linked List Chaining. set
 
         '''
 
         index = self._hash_mod(key)
 
         new_pair = LinkedPair(key, value)
-        new_linked_list = LinkedList(new_pair)
+        # new_linked_list = LinkedList(new_pair)
 
         # Check available storage
         # Omitting because this is happening manually in test file
@@ -124,10 +124,12 @@ class HashTable:
 
         # if index is empty, create new linked list with passed in pair
         if self.storage[index] is None:
-            self.storage[index] = new_linked_list
+            self.storage[index] = new_pair
         # otherwise, add new pair to next value
         else:
-            self.storage[index].add_to_head(new_pair)
+            new_pair.next = self.storage[index]
+            self.storage[index] = new_pair
+            # self.storage[index].add_to_head(new_pair)
 
         # self.count += 1
 
@@ -139,14 +141,17 @@ class HashTable:
 
         Print a warning if the key is not found.
 
-        Fill this in.
         '''
         index = self._hash_mod(key)
         if self.storage[index] is None:
             return None
         else:
-            self.storage[index].value = None
-            # self.count -= 1
+            current_pair = self.storage[index]
+            while current_pair is not None:
+                if current_pair.key == key:
+                    self.storage[index] = current_pair.next
+                current_pair = current_pair.next
+            return None
 
     def retrieve(self, key):
         '''
@@ -154,7 +159,6 @@ class HashTable:
 
         Returns None if the key is not found.
 
-        Fill this in.
         '''
         index = self._hash_mod(key)
 
@@ -163,7 +167,13 @@ class HashTable:
         # elif self.storage[index].next is not None:
         #     self.storage.
         else:
-            return self.storage[index].list_contains(key)
+            current_pair = self.storage[index]
+            while current_pair is not None:
+                if current_pair.key == key:
+                    return current_pair.value
+                current_pair = current_pair.next
+            return None
+            # return self.storage[index].list_contains(key)
 
     def resize(self):
         '''
@@ -172,7 +182,7 @@ class HashTable:
 
         Fill this in.
         '''
-        print(self.storage)
+        # print(self.storage)
 
         # double capacity
         self.capacity *= 2
@@ -187,20 +197,20 @@ class HashTable:
         self.storage = new_storage
 
         # this is showing currently filled HT(2)
-        print(old_storage)
+        # print(old_storage)
         # this is showing the 4x None's as created on line 181
-        print(self.storage)
+        # print(self.storage)
 
         # go through existing/old storage and re-hash all keys
         # insert LL into new storage
 
-        # for i in range(len(old_storage)):
-        #     if old_storage[i] is not None:
-        #         current_list = old_storage.head
-        #         while current_list:
-        #             self.insert(current_list.key, current_list.value)
-        #             # index = self._hash_mod(l.key)
-        #             current_list = current_list.next
+        for i in range(len(old_storage)):
+            if old_storage[i] is not None:
+                current_list = old_storage[i]
+                while current_list:
+                    self.insert(current_list.key, current_list.value)
+                    # index = self._hash_mod(l.key)
+                    current_list = current_list.next
 
 
 if __name__ == "__main__":
